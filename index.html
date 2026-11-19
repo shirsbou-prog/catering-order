@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הזמנת קייטרינג | Shir's Boutique</title>
+<style>
+  :root {
+    --pink:    #FFD6E0;
+    --pink-d:  #F0A8C0;
+    --gold:    #D4AF37;
+    --gold-d:  #9a7208;
+    --dark:    #1a1a1a;
+    --white:   #ffffff;
+    --green:   #25D366;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #fdf5f8;
+    color: #2a1a20;
+    min-height: 100vh;
+    padding-bottom: 120px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #1a0d10, #2d1520);
+    color: white;
+    text-align: center;
+    padding: 28px 20px 20px;
+    border-bottom: 3px solid var(--gold);
+  }
+  header .brand { font-size: 11px; letter-spacing: 4px; color: var(--gold); margin-bottom: 6px; }
+  header h1 { font-size: 22px; font-weight: 700; color: white; }
+  header .sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+  /* ── CUSTOMER INFO ── */
+  .info-box {
+    background: white;
+    margin: 16px 12px;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1.5px solid var(--pink);
+  }
+  .info-box h2 {
+    font-size: 14px; color: var(--gold-d); letter-spacing: 1px;
+    margin-bottom: 14px; border-bottom: 1px solid var(--pink); padding-bottom: 8px;
+  }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-grid.one { grid-template-columns: 1fr; }
+  .field label { font-size: 11px; font-weight: 700; color: #888; display: block; margin-bottom: 4px; }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid #e8d0da; border-radius: 8px;
+    font-size: 14px; font-family: inherit; background: #fdf5f8;
+    color: var(--dark); direction: rtl; outline: none;
+    transition: border-color .2s;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--pink-d); }
+  .field textarea { resize: vertical; min-height: 60px; }
+
+  /* ── CATEGORY ── */
+  .category {
+    margin: 16px 12px 0;
+  }
+  .cat-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(135deg, #1a0d10, #2d1520);
+    color: var(--gold);
+    padding: 12px 16px;
+    border-radius: 12px 12px 0 0;
+    font-size: 15px; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; user-select: none;
+  }
+  .cat-header .arrow { transition: transform .25s; font-size: 12px; }
+  .cat-header.open .arrow { transform: rotate(180deg); }
+  .cat-body {
+    background: white;
+    border: 1.5px solid var(--pink);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
+
+  /* ── ITEM ROW ── */
+  .item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #fce8f0;
+    transition: background .15s;
+  }
+  .item:last-child { border-bottom: none; }
+  .item.selected { background: #fff5f8; }
+  .item-top { display: flex; align-items: flex-start; gap: 10px; }
+  .item-info { flex: 1; }
+  .item-name { font-size: 14px; font-weight: 700; color: #2a1a20; }
+  .item-desc { font-size: 11px; color: #999; margin-top: 2px; line-height: 1.5; }
+  .item-note-field { font-size: 11px; color: #777; margin-top: 2px; font-style: italic; }
+  .item-price { font-size: 13px; font-weight: 700; color: var(--gold-d); white-space: nowrap; }
+
+  /* qty */
+  .qty-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .qty-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--pink-d); background: white;
+    color: #2a1a20; font-size: 16px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+    flex-shrink: 0;
+  }
+  .qty-btn:hover { background: var(--pink); }
+  .qty-num { font-size: 16px; font-weight: 700; min-width: 24px; text-align: center; }
+  .choice-input {
+    margin-top: 8px; width: 100%; padding: 7px 10px;
+    border: 1.5px solid #e8d0da; border-radius: 6px;
+    font-size: 12px; font-family: inherit; color: #444; direction: rtl;
+    background: #fdf5f8; outline: none;
+  }
+  .choice-input:focus { border-color: var(--pink-d); }
+
+  /* ── STICKY TOTAL ── */
+  .sticky-total {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 2px solid var(--pink);
+    padding: 10px 16px 14px;
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  }
+  .total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: #888; margin-bottom: 2px;
+  }
+  .total-row.main { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .total-row.discount { color: var(--gold-d); font-weight: 600; }
+  .total-row.final { font-size: 17px; font-weight: 900; color: #1a0d10; }
+  .discount-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--gold-d); font-weight: 600;
+    margin-bottom: 6px; cursor: pointer;
+  }
+  .discount-toggle input { accent-color: var(--gold); width: 16px; height: 16px; cursor: pointer; }
+
+  .send-btn {
+    width: 100%; background: var(--green); color: white;
+    border: none; border-radius: 50px; padding: 14px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .2s;
+  }
+  .send-btn:hover { background: #1ebe5d; }
+  .send-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* ── EMPTY STATE ── */
+  .empty-msg { text-align: center; color: #ccc; font-size: 12px; padding: 6px 0; }
+
+  /* responsive */
+  @media (max-width: 400px) {
+    .field-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">SHIR'S BOUTIQUE · קייטרינג חלבי ומגשי אירוח</div>
+  <h1>טופס הזמנת קייטרינג</h1>
+  <div class="sub">בחרו מהתפריט ושלחו — נחזור אליכם עם אישור ותשלום</div>
+</header>
+
+<!-- פרטי לקוח -->
+<div class="info-box">
+  <h2>פרטי ההזמנה</h2>
+  <div class="field-grid">
+    <div class="field">
+      <label>שם מלא *</label>
+      <input type="text" id="name" placeholder="שם פרטי ומשפחה">
+    </div>
+    <div class="field">
+      <label>טלפון *</label>
+      <input type="tel" id="phone" placeholder="05X-XXXXXXX">
+    </div>
+    <div class="field">
+      <label>תאריך האירוע *</label>
+      <input type="date" id="event-date">
+    </div>
+    <div class="field">
+      <label>כמות אנשים משוערת</label>
+      <input type="number" id="guests" placeholder="מספר אורחים" min="1">
+    </div>
+  </div>
+  <div class="field-grid one" style="margin-top:10px;">
+    <div class="field">
+      <label>סוג האירוע / הערות</label>
+      <textarea id="notes" placeholder="ברית, שבת, ימי עיון, בקשות מיוחדות..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- תפריט -->
+<div id="menu-container"></div>
+
+<!-- sticky total -->
+<div class="sticky-total">
+  <div class="total-row main">
+    <span>סה"כ לפני הנחה</span>
+    <span id="subtotal-display">0 ₪</span>
+  </div>
+  <label class="discount-toggle">
+    <input type="checkbox" id="discount-check" onchange="recalc()">
+    החל הנחת השקה 15% על כל התפריט
+  </label>
+  <div class="total-row discount" id="discount-row" style="display:none;">
+    <span>הנחה (15%)</span>
+    <span id="discount-display">0 ₪</span>
+  </div>
+  <div class="total-row final">
+    <span>סה"כ לתשלום</span>
+    <span id="total-display">0 ₪</span>
+  </div>
+  <button class="send-btn" id="send-btn" onclick="sendOrder()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M11.99 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.306A9.96 9.96 0 0011.99 22C17.523 22 22 17.523 22 12S17.523 2 11.99 2zm.01 18a7.96 7.96 0 01-4.065-1.112l-.292-.173-3.006.788.804-2.926-.19-.301A7.96 7.96 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/>
+    </svg>
+    שלח הזמנה לשיר בוואטסאפ
+  </button>
+</div>
+
+<script>
+// ── נתוני תפריט ─────────────────────────────────────
+const MENU = [
+  { cat: "מאפים 🥐", items: [
+    { id:"m1",  name:"קרואסון סלמון כבוש",      desc:"קרואסון חמאה | גבינת שמנת/פסטו | סלמון בכבישה ביתית | רוקט | מלפפון · 15 יח' במגש 25×35",  price:239, note:"*גבינת שמנת לנוהגים בהיתר" },
+    { id:"m2",  name:"קרואסון פסטו בולגרית",     desc:"קרואסון חמאה | פסטו | גבינה בולגרית מעודנת | חסה לאליק · 15 יח' במגש 25×35",              price:209 },
+    { id:"m3",  name:"בורקיטס סביח",              desc:"בורקיטס פריך | טחינה | ביצה קשה | חציל | מלפפון חמוץ | פטרוזיליה · 16 יח' במגש 25×35",    price:179 },
+    { id:"m4",  name:"בורקיטס פינוקים",           desc:"בורקיטס פריך | ממרח עגבניות | ביצה קשה | מלפפון חמוץ · 16 יח' במגש 25×35",                price:179 },
+    { id:"m5",  name:"מגש בורקיטס מעורב",         desc:"סביח + פינוקים · 16 יח' במגש 25×35",                                                        price:179 },
+    { id:"m6",  name:"לחם מחמצת ומטבלים",         desc:"לחם מחמצת פרוס | 4 מטבלים לבחירה · מגש 25×35",                                              price:109, choice:"בחירת מטבלים (שום קונפי/עגבניות/זיתים/פסטו/ריבת בצל/חמאה/טחינה/ריבת תות):" },
+    { id:"m7",  name:"בורקס גבינה אישי ענק",      desc:"בורק גבינה | קארסט שומשום לבן ושחור",                                                        price:19,  priceNote:"מחיר ליחידה" },
+    { id:"m8",  name:"קיש משפחתי קוטר 20",        desc:"פלפלים קלויים / בצלים / בטטה / פטריות ובצלים",                                               price:129, choice:"בחירת מילוי:" },
+    { id:"m9",  name:"קובנה חמאה קוטר 16",        desc:"קובנה רכה ועסיסית עבודת יד מפוצצת בחמאה חומה",                                               price:29,  priceNote:"מחיר ליחידה" },
+  ]},
+  { cat: "כריכים ומאפים 🥪", items: [
+    { id:"k1",  name:"פיתה ביס סביח",             desc:"מיני פיתה | טחינה | חציל | ביצה קשה | מלפפון חמוץ | פטרוזיליה · 14 יח'",                    price:149 },
+    { id:"k2",  name:"כריך ביס סלט ביצים",         desc:"לחמניית ביס רכה | סלט ביצים | בצל ירוק · 16 יח'",                                            price:189 },
+    { id:"k3",  name:"כריך לחם קסטן",              desc:"20 יח' (חצאים) | אנטיפסטי או פסטו בולגרית — ניתן 2 סוגים למגש",                              price:229, choice:"בחירת סוגים (אנטיפסטי / פסטו בולגרית):" },
+    { id:"k4",  name:"פוקאצ'ות אישיות",            desc:"פוקאצ'ות עננים | פסטו | מוצרלה · 12 יח'",                                                     price:179 },
+    { id:"k5",  name:"קישים אישיים (ביס)",          desc:"מיני קישים · 24 יח' | בטטה/פלפלים קלויים/בצלים/פטריות/מיקס ירקות",                           price:199, choice:"בחירת מילוי (עד 2 סוגים):" },
+    { id:"k6",  name:"טורטיות",                    desc:"24 יח' | 2 מילויים לבחירה: טונה / בלקני / סביח",                                              price:179, choice:"בחירת מילויים:" },
+  ]},
+  { cat: "סלטים וירקות 🥗", items: [
+    { id:"s1",  name:"סלט עלים",                   desc:"מיקס עלי בייבי | רוקט | חסות | תפוח פריך | אגוזי מלך | ויניגרט הדרים · קערה 2.5 ליטר",       price:179 },
+    { id:"s2",  name:"סלט שוק",                    desc:"חסה | פלפלים בצבעים | מלפפון | זיתים שחורים | גבינה בולגרית | שמן זית",                        price:179 },
+    { id:"s3",  name:"סלט קפרזה",                  desc:"עגבניות שרי חצויות | בייבי מוצרלה | בזיליקום | בלסמי מצומצם · מגש 25×35",                      price:179 },
+    { id:"s4",  name:"סלט בריאות",                 desc:"בורגול | סלרי | כוסברה | פטרוזיליה | קוביות בטטה | אגוזי מלך | פקאן | חמוציות",                price:169 },
+    { id:"s5",  name:"מגש ירקות חתוכים",            desc:"חגיגת ירקות צבעוניים | תירס גמדי | לימונים טריים | טחינה",                                     price:139 },
+    { id:"s6",  name:"סלט תאילנדי",                desc:"כרוב לבן | מלפפון ירוק | בצל ירוק | רוטב סויה וחמאת בוטנים",                                   price:149 },
+  ]},
+  { cat: "תוספות ✨", items: [
+    { id:"t1",  name:"פלטת גבינות",                desc:"4 סוגי גבינות מיוחדות | אגוזי פקאן | אגוזי מלך | חמוציות",                                    price:249 },
+    { id:"t2",  name:"סלמון כבוש",                 desc:"דג סלמון בכבישה ביתית | רוקט / שמיר",                                                         price:169 },
+    { id:"t3",  name:"אנטיפסטי",                   desc:"מגוון ירקות קלויים | אורגנו טרי / טימין | מלח ים | שמן זית",                                   price:159 },
+    { id:"t4",  name:"קרפצ'יו סלק",                desc:"סלק מתוק פרוס דק | עלי בייבי | גבינת שמנת | פקאן | בלסמי מצומצם",                              price:129 },
+    { id:"t5",  name:"קרפצ'יו חציל",               desc:"חציל קלוי | כוסברה | טחינה | שמן זית",                                                         price:89  },
+    { id:"t6",  name:"מתבל בצנצנת 150 גרם",        desc:"ממרח עגבניות/ממרח זיתים/פסטו/ריבת בצל/חמאה מוקצפת/טחינה / שום קונפי 35 ₪",                    price:24,  priceNote:"מחיר ליחידה", choice:"בחירת סוג:" },
+  ]},
+  { cat: "פסטות 🍝", items: [
+    { id:"p1",  name:"פסטה אלפרדו שמנת פטריות",   desc:"בתבנית אלומיניום לחימום + מיכל רוטב בצד",                                                      price:159 },
+    { id:"p2",  name:"פסטה עגבניות",               desc:"בתבנית אלומיניום לחימום",                                                                      price:159 },
+    { id:"p3",  name:"פסטה רוזה",                  desc:"בתבנית אלומיניום לחימום",                                                                      price:159 },
+    { id:"p4",  name:"תפוח אדמה מוקרם",            desc:"פרוסות תפוח אדמה ברוטב שמנת מוקרם",                                                            price:179 },
+  ]},
+  { cat: "קינוחים 🍰", items: [
+    { id:"q1",  name:"טרטלטים מיני פאי (ביס)",     desc:"24 יח' | לימון מרנג / שוקולד ולוז / שוקולד / פקאן / תפוחים וקראמבל",                            price:199, choice:"בחירת טעמים (עד 2):" },
+    { id:"q2",  name:"טארט קוטר 24",               desc:"לימון מרנג / שוקולד לבן ולוז / שוקולד קפה / פקאן",                                             price:210, choice:"בחירת טעם:" },
+    { id:"q3",  name:"קינוחי כוסות",               desc:"20 יח' | אוראו / ריבת חלב / בואנו / נוטלה / לוז / פיסטוק / חלבה",                               price:179, choice:"בחירת טעמים (עד 2):" },
+    { id:"q4",  name:"בראוניז פאדג'",              desc:"24 יח' | עשיר בשוקולד וחמאה | טופ אגוזי לוז מקורמלים",                                          price:189 },
+    { id:"q5",  name:"מגש עוגות בחושות",           desc:"כ-32 פרוסות | תפוזים / וניל / שיש / שוקולד / קפה",                                              price:129, choice:"בחירת סוגים (עד 2):" },
+    { id:"q6",  name:"מגש פירות העונה",            desc:"מגש פירות טריים של העונה",                                                                      price:199 },
+    { id:"q7",  name:"מגש עוגות שמרים",            desc:"שוקולד לוז / שקדים / קינמון וחמאה / גבינה | עד 3 סוגים",                                        price:169, choice:"בחירת סוגים (עד 3):" },
+    { id:"q8",  name:"עוגת גבינה אפויה קוטר 22",   desc:"עוגת גבינת שמנת קרמית אפויה | רוטב קרמל בצד",                                                   price:200 },
+  ]},
+];
+
+// ── State ──────────────────────────────────────────
+const state = {};
+
+// ── Build DOM ─────────────────────────────────────
+function buildMenu() {
+  const container = document.getElementById('menu-container');
+  MENU.forEach((section, si) => {
+    const div = document.createElement('div');
+    div.className = 'category';
+
+    const header = document.createElement('div');
+    header.className = 'cat-header open';
+    header.innerHTML = `<span>${section.cat}</span><span class="arrow">▲</span>`;
+    header.onclick = () => {
+      body.style.display = body.style.display === 'none' ? '' : 'none';
+      header.classList.toggle('open');
+    };
+
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+
+    section.items.forEach(item => {
+      state[item.id] = 0;
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.id = `row-${item.id}`;
+
+      const priceLabel = item.priceNote
+        ? `${item.price} ₪ <span style="font-size:10px;color:#aaa;">(${item.priceNote})</span>`
+        : `${item.price} ₪`;
+
+      row.innerHTML = `
+        <div class="item-top">
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <div class="item-desc">${item.desc}</div>
+            ${item.note ? `<div class="item-note-field">${item.note}</div>` : ''}
+          </div>
+          <div class="item-price">${priceLabel}</div>
+        </div>
+        <div class="qty-wrap">
+          <button class="qty-btn" onclick="change('${item.id}',-1)">−</button>
+          <span class="qty-num" id="qty-${item.id}">0</span>
+          <button class="qty-btn" onclick="change('${item.id}',1)">+</button>
+          <span style="font-size:11px;color:#bbb;margin-right:4px;">מגשים</span>
+        </div>
+        ${item.choice ? `<input class="choice-input" id="choice-${item.id}" placeholder="${item.choice}" style="display:none;">` : ''}
+      `;
+      body.appendChild(row);
+    });
+
+    div.appendChild(header);
+    div.appendChild(body);
+    container.appendChild(div);
+  });
+}
+
+function change(id, delta) {
+  state[id] = Math.max(0, (state[id] || 0) + delta);
+  document.getElementById(`qty-${id}`).textContent = state[id];
+  const row = document.getElementById(`row-${id}`);
+  row.classList.toggle('selected', state[id] > 0);
+  const choiceEl = document.getElementById(`choice-${id}`);
+  if (choiceEl) choiceEl.style.display = state[id] > 0 ? 'block' : 'none';
+  recalc();
+}
+
+function recalc() {
+  let subtotal = 0;
+  MENU.forEach(section => {
+    section.items.forEach(item => {
+      subtotal += item.price * (state[item.id] || 0);
+    });
+  });
+  const hasDiscount = document.getElementById('discount-check').checked;
+  const discount = hasDiscount ? Math.round(subtotal * 0.15) : 0;
+  const total = subtotal - discount;
+
+  document.getElementById('subtotal-display').textContent = subtotal.toLocaleString() + ' ₪';
+  document.getElementById('discount-display').textContent = '-' + discount.toLocaleString() + ' ₪';
+  document.getElementById('total-display').textContent = total.toLocaleString() + ' ₪';
+  document.getElementById('discount-row').style.display = hasDiscount && subtotal > 0 ? 'flex' : 'none';
+}
+
+function sendOrder() {
+  const name      = document.getElementById('name').value.trim();
+  const phone     = document.getElementById('phone').value.trim();
+  const eventDate = document.getElementById('event-date').value;
+  const guests    = document.getElementById('guests').value.trim();
+  const notes     = document.getElementById('notes').value.trim();
+
+  if (!name)  { alert('נא להזין שם מלא'); return; }
+  if (!phone) { alert('נא להזין מספר טלפון'); return; }
+
+  const selected = [];
+  MENU.forEach(section => {
+    const catItems = [];
+    section.items.forEach(item => {
+      if ((state[item.id] || 0) > 0) {
+        const choiceEl = document.getElementById(`choice-${item.id}`);
+        const choiceVal = choiceEl ? choiceEl.value.trim() : '';
+        catItems.push({ name: item.name, qty: state[item.id], price: item.price, choice: choiceVal });
+      }
+    });
+    if (catItems.length > 0) selected.push({ cat: section.cat, items: catItems });
+  });
+
+  if (selected.length === 0) { alert('נא לבחור לפחות פריט אחד'); return; }
+
+  let subtotal = 0;
+  selected.forEach(s => s.items.forEach(i => { subtotal += i.price * i.qty; }));
+  const hasDiscount = document.getElementById('discount-check').checked;
+  const discount = hasDiscount ? Math.round(subtotal * 0.15) : 0;
+  const total = subtotal - discount;
+
+  // בנה הודעה
+  let msg = `*הזמנת קייטרינג חדשה - Shir's Boutique* 🌸\n\n`;
+  msg += `*שם לקוח:* ${name}\n`;
+  msg += `*טלפון:* ${phone}\n`;
+  if (eventDate) msg += `*תאריך אירוע:* ${new Date(eventDate).toLocaleDateString('he-IL')}\n`;
+  if (guests) msg += `*כמות אורחים:* ${guests}\n`;
+  if (notes) msg += `*סוג אירוע / הערות:* ${notes}\n`;
+  msg += '\n';
+
+  selected.forEach(section => {
+    msg += `*${section.cat}*\n`;
+    section.items.forEach(item => {
+      msg += `• ${item.name} × ${item.qty} = ${(item.price * item.qty).toLocaleString()} ₪`;
+      if (item.choice) msg += `\n  ↳ ${item.choice}`;
+      msg += '\n';
+    });
+    msg += '\n';
+  });
+
+  msg += `*סכום לפני הנחה:* ${subtotal.toLocaleString()} ₪\n`;
+  if (hasDiscount) {
+    msg += `*הנחת השקה 15%:* -${discount.toLocaleString()} ₪\n`;
+  }
+  msg += `*סה"כ לתשלום:* ${total.toLocaleString()} ₪`;
+
+  const url = `https://wa.me/972534247937?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+buildMenu();
+recalc();
+</script>
+</body>
+</html>
